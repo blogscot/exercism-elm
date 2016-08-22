@@ -1,6 +1,5 @@
 module DifferenceOfSquares exposing (..)
 
-import Array exposing (initialize, toList)
 import List exposing (map, sum)
 
 squareOfSum : Int -> Int
@@ -19,5 +18,4 @@ square : Int -> Int
 square x = x^2
 
 range : Int -> List Int
-range num =
-  initialize (num+1) identity |> toList
+range num = [1..num]
