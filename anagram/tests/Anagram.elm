@@ -1,18 +1,14 @@
 module Anagram exposing (..)
 
-import String
-import List
+import String exposing (toLower, toList)
 
 detect : String -> List String -> List String
 detect base candidates =
   let
-    normalize : String -> List String
+    normalize : String -> List Char
     normalize string =
-      string
-      |> String.toLower
-      |> String.split ""
-      |> List.sort
+      string |> toLower |> toList |> List.sort
   in
   candidates
   |> List.filter (\word ->
-    normalize(word) == normalize(base) && String.toLower word /= String.toLower base)
+    normalize(word) == normalize(base) && toLower word /= toLower base)
