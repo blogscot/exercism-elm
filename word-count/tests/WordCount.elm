@@ -1,6 +1,6 @@
 module WordCount exposing (..)
 
-import Dict exposing (Dict)
+import Dict exposing (Dict, update)
 import String exposing (toLower)
 import Regex exposing (Regex, replace, regex)
 
@@ -8,10 +8,7 @@ wordCount : String -> Dict String Int
 wordCount string =
   let
     inc : Maybe Int -> Maybe Int
-    inc x =
-      case x of
-        Just num -> Just (num + 1)
-        Nothing -> Just 1
+    inc = Maybe.withDefault 0 >> (+) 1 >> Just
 
     punctuation : Regex
     punctuation = regex "[!@#$%^&*():;\"',.]+"
@@ -25,4 +22,4 @@ wordCount string =
 
   in
     words
-    |> List.foldl(\word acc -> Dict.update word inc acc) Dict.empty
+    |> List.foldl (\word acc -> update word inc acc) Dict.empty
