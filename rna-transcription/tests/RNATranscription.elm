@@ -1,34 +1,20 @@
 module RNATranscription exposing (..)
 
-import String exposing (toList, join)
+import String exposing (cons, toList)
 
 toRNA : String -> Result Char String
 toRNA dna =
   let
-    seq : List Char
-    seq = toList dna
-
-    dna_nucleotides : List Char
-    dna_nucleotides = ['G', 'C', 'T', 'A']
-
-    valid : List Char -> Bool
-    valid = List.all (\chr -> List.member chr dna_nucleotides)
-
-    transcribe : Char -> Char
+    transcribe : Char -> Result Char Char
     transcribe chr =
       case chr of
-        'G' -> 'C'
-        'C' -> 'G'
-        'T' -> 'A'
-        'A' -> 'U'
-        _ -> chr
+        'G' -> Ok 'C'
+        'C' -> Ok 'G'
+        'T' -> Ok 'A'
+        'A' -> Ok 'U'
+        _ -> Err chr
     in
-    if valid seq then
-      seq
-      |> List.map (\chr -> transcribe chr |> String.fromChar)
-      |> String.join ""
-      |> Ok
-    else
-      case seq of
-        x::_ -> Err x
-        _ -> Err '?'
+    case String.uncons dna of
+        Just (head, tail) ->
+          Result.map2 cons (transcribe head) (toRNA tail)
+        Nothing -> Ok ""
