@@ -4,14 +4,7 @@ import Test.Runner.Node exposing (run)
 import Json.Encode exposing (Value)
 import Test exposing (..)
 import Expect
-import RunLengthEncoding exposing (
-  version,
-  decode,
-  encode,
-  take_while,
-  group_by_char,
-  compress,
-  decompress)
+import RunLengthEncoding exposing (version, decode, encode, take_while, group_by_char)
 import String exposing (toList)
 
 
@@ -25,10 +18,6 @@ tests =
             \() -> Expect.equal ['A', 'A'] (take_while (\x -> x == 'A') (toList "AABBBCCCC") )
           , test "group by char" <|
             \() -> Expect.equal [['A', 'A', 'A'], ['B'], ['C']] (group_by_char ['A', 'A', 'A', 'B', 'C'])
-          , test "decompress string" <|
-            \() -> Expect.equal (String.toList "12W1B12W3B24W1B") (decompress <| String.toList "12WB12W3B24WB")
-          , test "decompress string" <|
-            \() -> Expect.equal (String.toList "12WB12W3B24WB") (compress <| String.toList "12W1B12W3B24W1B")
           , test "encode simple" <|
             \() -> Expect.equal "2A3B4C" (encode "AABBBCCCC")
           , test "decode simple" <|
@@ -49,10 +38,10 @@ tests =
             \() ->
                 Expect.equal "WWWWWWWWWW"
                     (decode "10W")
-        -- , test "encode unicode" <|
-        --     \() -> Expect.equal "⏰3⚽2⭐⏰" (encode "⏰⚽⚽⚽⭐⭐⏰")
-        -- , test "decode unicode" <|
-        --     \() -> Expect.equal "⏰⚽⚽⚽⭐⭐⏰" (decode "⏰3⚽2⭐⏰")
+        , test "encode unicode" <|
+            \() -> Expect.equal "⏰3⚽2⭐⏰" (encode "⏰⚽⚽⚽⭐⭐⏰")
+        , test "decode unicode" <|
+            \() -> Expect.equal "⏰⚽⚽⚽⭐⭐⏰" (decode "⏰3⚽2⭐⏰")
         ]
 
 
