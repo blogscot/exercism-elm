@@ -3,7 +3,7 @@ module RunLengthEncoding exposing (..)
 import List exposing (append, drop, head, length)
 import Regex exposing (regex)
 import String
-import Debug
+import Char exposing (isDigit)
 
 encode : String -> String
 encode string =
@@ -17,6 +17,7 @@ encode string =
         |> String.fromChar
     in
       acc ++ (x |> length |> toString) ++ firstChar) ""
+  |> compress'
 
 
 group_by_char : List Char -> List (List Char)
@@ -41,6 +42,7 @@ take_while fn chars  =
 decode : String -> String
 decode string =
   string
+  |> decompress'
   |> Regex.split Regex.All (regex "(\\d+)(\\D)")
   |> decode3
 
@@ -48,14 +50,45 @@ decode string =
 decode3 : List String -> String
 decode3 list =
   case list of
-    _ :: digit :: letter :: rest ->
+    [] -> ""
+
+    "" :: digit :: letter :: rest ->
       let
-        _ = Debug.log "decode3" digit
         num = Result.withDefault 0 (String.toInt digit)
       in
         String.repeat num letter ++ decode3 rest
-    _ -> ""
 
+    letter :: rest -> letter ++ decode3 rest
+
+
+--  "12W1B12W3B24W1B" => "12WB12W3B24WB"
+compress : List Char -> List Char
+compress list =
+  case list of
+    x::y::z::rest ->
+      if not (isDigit x) && y == '1' && not (isDigit z)
+        then x :: compress (z :: rest)
+      else x :: compress (y :: z :: rest)
+    x::y::[] -> if x == '1' then [y] else list
+    x :: [] -> [x]
+    [] -> []
+
+compress' : String -> String
+compress' = String.toList >> compress >> String.fromList
+
+--  "12WB12W3B24WB" => "12W1B12W3B24W1B"
+decompress : List Char -> List Char
+decompress list =
+  case list of
+    x::y::rest ->
+      if not (isDigit x) && not (isDigit y)
+        then x :: '1' :: decompress (y :: rest)
+      else x :: decompress (y :: rest)
+    x :: [] -> [x]
+    [] -> []
+
+decompress' : String -> String
+decompress' = String.toList >> decompress >> String.fromList
 
 version : Int
 version = 2
